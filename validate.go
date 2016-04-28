@@ -85,6 +85,7 @@ func bundleValidate(spec rspec.Spec, rootfs string) {
 	checkSemVer(spec.Version)
 	checkProcess(spec.Process, rootfs)
 	checkMounts(spec.Mounts, rootfs)
+	checkHooks(spec.Hooks, rootfs)
 	checkLinux(spec.Linux, rootfs)
 }
 
@@ -102,6 +103,29 @@ func checkMounts(mounts []rspec.Mount, rootfs string) {
 			logrus.Fatalf("Cannot find the mount point: %v", rootfsPath)
 		} else if !fi.IsDir() {
 			logrus.Fatalf("Mount point: %v is not a directory.", rootfsPath)
+		}
+	}
+}
+
+func checkHooks(hooks rspec.Hooks, rootfs string) {
+	for _, prestart := range hooks.Prestart {
+		binPath := path.Join(rootfs, prestart.Path)
+		if _, err := os.Stat(binPath); err != nil {
+			logrus.Fatalf("Cannot find pre-start hook: %v", binPath)
+		}
+	}
+
+	for _, poststart := range hooks.Poststart {
+		binPath := path.Join(rootfs, poststart.Path)
+		if _, err := os.Stat(binPath); err != nil {
+			logrus.Fatalf("Cannot find post-start hook: %v", binPath)
+		}
+	}
+
+	for _, poststop := range hooks.Poststop {
+		binPath := path.Join(rootfs, poststop.Path)
+		if _, err := os.Stat(binPath); err != nil {
+			logrus.Fatalf("Cannot find post-stop hook: %v", binPath)
 		}
 	}
 }
