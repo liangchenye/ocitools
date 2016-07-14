@@ -24,7 +24,7 @@ The error message will be printed if the OCI bundle failed the validation proced
 ```sh
 $ ocitools generate
 $ ocitools validate
-INFO[0000] Bundle validation succeeded.
+Bundle validation succeeded.
 ```
 
 ## Testing OCI runtimes
